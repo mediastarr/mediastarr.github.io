@@ -2,60 +2,41 @@
 <html>
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=600,initial-scale=1">
-<title>StarrTube v28</title>
+<title>StarrTube v29</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:system-ui}
 .banner{padding:12px;background:#111;text-align:center;font-weight:700}
-.tabs{display:flex;background:#000;border-bottom:1px solid #222}
-.tab{flex:1;padding:14px;background:none;border:0;color:#777;font-size:15px}
+.tabs{display:flex;background:#000}
+.tab{flex:1;padding:14px;background:none;border:0;color:#777}
 .tab.on{color:#fff;border-bottom:2px solid red}
-#player{width:100%;height:calc(100vh - 94px);border:0;display:block}
-#searchBox{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:20px;border-radius:12px;display:none;z-index:99}
-#searchBox input{width:260px;padding:12px;background:#000;color:#fff;border:1px solid #333;border-radius:6px}
+#player{width:100%;height:calc(100vh - 50px);border:0}
 </style>
 </head>
 <body>
 <div class="banner">StarrTube</div>
 <div class="tabs">
- <button class="tab on" data-q="full movie animation anime">Home</button>
- <button class="tab" data-q="#shorts">Shorts</button>
- <button class="tab" data-q="live">Live</button>
- <button class="tab" data-q="search">Search</button>
+ <button class="tab on" onclick="go('home')">Home</button>
+ <button class="tab" onclick="go('shorts')">Shorts</button>
+ <button class="tab" onclick="go('live')">Live</button>
+ <button class="tab" onclick="go('search')">Search</button>
 </div>
-<iframe id="player" allowfullscreen allow="autoplay" src="https://www.youtube.com/embed/videoseries?listType=search&list=full%20movie%20animation%20anime"></iframe>
-
-<div id="searchBox">
-  <input id="q" placeholder="Search YouTube">
-  <button onclick="doSearch()" style="padding:12px;margin-left:6px;background:red;border:0;color:#fff;border-radius:6px">Go</button>
-</div>
+<iframe id="player" allowfullscreen src="https://piped.video/embed/videoseries?listType=search&list=full+movie+animation"></iframe>
 
 <script>
-const tabs=[...document.querySelectorAll('.tab')];
-const player=document.getElementById('player');
-const box=document.getElementById('searchBox');
+const p=document.getElementById('player');
+const tabs=document.querySelectorAll('.tab');
 
-function load(query){
-  player.src=`https://www.youtube.com/embed/videoseries?listType=search&list=${encodeURIComponent(query)}&modestbranding=1&rel=0`;
+function go(t){
+  tabs.forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase()===t));
+  const q={
+    home:'full movie animation anime',
+    shorts:'shorts',
+    live:'live stream',
+    search:prompt('Search:')||'trending'
+  }[t];
+  // Piped allows search embeds where YouTube blocks them
+  p.src=`https://piped.video/embed/videoseries?listType=search&list=${encodeURIComponent(q)}`;
 }
-
-tabs.forEach(t=>t.onclick=()=>{
-  tabs.forEach(b=>b.classList.remove('on'));t.classList.add('on');
-  if(t.dataset.q==='search'){box.style.display='block';document.getElementById('q').focus();return}
-  box.style.display='none';
-  load(t.dataset.q);
-});
-
-function doSearch(){
-  const q=document.getElementById('q').value;
-  if(q){box.style.display='none';load(q)}
-}
-
-// D-pad
-document.addEventListener('keydown',e=>{
-  const i=tabs.findIndex(t=>t.classList.contains('on'));
-  if(e.key==='ArrowRight')tabs[(i+1)%4].click();
-  if(e.key==='ArrowLeft')tabs[(i+3)%4].click();
-});
 </script>
 </body>
 </html>
